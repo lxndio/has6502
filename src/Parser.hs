@@ -25,9 +25,15 @@ splitString :: Char -> String -> [String]
 splitString c as = split c as "" where
   split :: Char -> String -> String -> [String]
   split c (a:as) curr
-    | a == c          = curr : (split c as "")
+    | a == c          = if curr == "" then split c as "" else curr : (split c as "")
     | otherwise       = split c as (curr ++ [a])
-  split c []     curr = [curr]
+  split c []     curr = if curr == "" then [] else [curr]
+
+-- Removes whitespaces at the beginning and end of a string
+trim :: String -> String
+trim l = trimTail $ dropWhile (== ' ') l where
+  trimTail ls = if l == ' ' then trimTail (init ls) else ls where
+    l = last ls
 
 -- Split string using space as delimiter and capitalize all characters
 tokenizeString :: String -> [String]
