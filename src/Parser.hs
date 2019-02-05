@@ -1,13 +1,25 @@
 module Parser
 ( parseLine ) where
 
-data Line = Line { label  :: String
-                 , instr  :: String
-                 , params :: [String]
+import Data.Char (toUpper)
+
+data Label = Label String deriving (Show)
+
+data Instruction = Instruction { name :: String
+                               , opcode :: String
+                               } deriving (Show)
+
+data Line = Line { label  :: Maybe Label
+                 , instr  :: Maybe Instruction
+                 , params :: Maybe [String]
                  } deriving (Show)
 
-instructions :: [String]
-instructions = ["LDA"]
+data ParseError = ParseError { line :: Int
+                             , msg  :: String
+                             } deriving (Show)
+
+instructions :: [Instruction]
+instructions = [Instruction "LDA" ""]
 
 splitString :: Char -> String -> [String]
 splitString c as = split c as "" where
@@ -17,37 +29,45 @@ splitString c as = split c as "" where
     | otherwise       = split c as (curr ++ [a])
   split c []     curr = [curr]
 
--- Gets the position of the first occurrence of a char in a string
-posOfChar :: Char -> String -> Int
-posOfChar c as = countPos c as 0 where
-  countPos :: Char -> String -> Int -> Int
-  countPos c (a:as) pos
-    | a == c            = pos
-    | otherwise         = countPos c as (pos+1)
+-- Split string using space as delimiter and capitalize all characters
+tokenizeString :: String -> [String]
+tokenizeString s = map (map toUpper) $ splitString ' ' s
 
--- Removes whitespaces at the beginning and end of a string
-trim :: String -> String
-trim l = trimTail $ dropWhile (== ' ') l where
-  trimTail ls = if l == ' ' then trimTail (init ls) else ls where
-    l = last ls
+maybeHead :: [a] -> Maybe a
+maybeHead as = if length as == 0 then Nothing else Just $ head as
 
-hasLabel :: String -> Bool
-hasLabel l = (':' `elem` l) && (l !! (posOfChar ':' l - 1) /= ' ')
+-- Get the first occurrence of a label in a tokenized line
+getLabel :: [String] -> Maybe Label
+getLabel l = if length (labelList l) == 0 then Nothing else Just $ Label $ init $ head $ labelList l where
+  labelList l = filter ((== ':') . last) l
 
-getLabel :: String -> Maybe String
-getLabel l = if hasLabel l then Just (trim $ take (posOfChar ':' l) l) else Nothing
+getInstrByName :: String -> Maybe Instruction
+getInstrByName s = if length instructions' == 0 then Nothing else Just $ head $ instructions' where
+  instructions' = filter ((== s) . name) instructions
 
-removeLabel :: String -> String
-removeLabel l = if hasLabel l then drop (posOfChar ':' l + 1) l else l
+instrExistsByName :: String -> Bool
+instrExistsByName s = if length instructions' == 0 then False else True where
+  instructions' = filter ((== s) . name) instructions
 
-parseLine :: String -> Line
-parseLine l = Line { label = labelOfL
-                   , instr = ""
-                   , params = []
-                   } where
-  labelOfL = case getLabel l of Just label -> label
-                                Nothing    -> ""
+-- Get the first occurrence of an instruction in a tokenized line
+getInstruction :: [String] -> Maybe Instruction
+getInstruction (l:ls) = case getInstrByName l of i@(Just _) -> i
+                                                 Nothing    -> getInstruction ls
+getInstruction []     = Nothing
 
-parseProgram :: [String] -> [Line]
-parseProgram (l:ls) = parseLine l : parseProgram ls
-parseProgram []     = []
+-- TODO Use monad to throw ParseError on failure caused by nothing in case of:
+--      - no instruction but parameters
+--      - parameters but no instruction
+--      - non-label text before instruction
+--      - etc.
+parseLine :: String -> Either ParseError Line
+parseLine l = Right Line { label = getLabel tl
+                         , instr = getInstruction tl
+                         , params = Nothing
+                         } where
+  tl = tokenizeString l
+
+
+--parseLines :: [String] -> [Line]
+--parseLines (l:ls) = parseLine l : parseLines ls
+--parseLines []     = []
