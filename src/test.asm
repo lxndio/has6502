@@ -1,4 +1,3 @@
 test: LDA
-NOP
-BRK
-LDA
+test2: LDA
+test3: LDA

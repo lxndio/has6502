@@ -44,7 +44,7 @@ parseLines ls = parseLines' ls ([], 0, []) 1 where
   parseLines' (l:ls) fullEnv lineNr = case parseLineFullEnv l fullEnv lineNr of
     Left pe       -> Left pe
     Right fullEnv -> parseLines' ls fullEnv (lineNr+1)
-  parseLines' [] fullEnv _          = Right fullEnv
+  parseLines' [] (ls, prgCnt, lblLst) _ = Right (reverse ls, prgCnt, lblLst) -- reverse because of ":" in parseLineFullEnv
 
 --parseLines :: [String] -> [Line]
 --parseLines (l:ls) = parseLine l : parseLines ls
