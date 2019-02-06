@@ -4,4 +4,6 @@ import Parser
 
 main :: IO ()
 main = do
-  putStrLn "Hello, Haskell!"
+  content <- readFile "test.asm"
+  let contentLines = lines content
+  putStrLn $ show $ parseLines contentLines

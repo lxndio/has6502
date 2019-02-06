@@ -1,5 +1,5 @@
 module Parser
-( parseLine ) where
+( parseLines ) where
 
 import Instructions
 import Utils
@@ -22,7 +22,7 @@ data ParseError = ParseError { line :: Int
 -- Returns: Either ParseError (Line, prgCnt, lblLst)
 generateLine :: Maybe String -> Maybe Instruction -> (Int, [(String, Int)]) -> Int -> Either ParseError (Line, Int, [(String, Int)])
 generateLine _   Nothing      _                lineNr = Left  $ ParseError lineNr "unknown instruction"
-generateLine lbl (Just instr) (prgCnt, lblLst) _      = Right $ (Line lbl $ Just "TODO", prgCnt+0, addLbl lbl prgCnt lblLst)
+generateLine lbl (Just instr) (prgCnt, lblLst) _      = Right $ (Line lbl $ Just "TODO", prgCnt+0, addLbl lbl prgCnt lblLst) -- TODO "TODO" and pgtCnt+0
   where
     addLbl :: Maybe String -> Int -> [(String, Int)] -> [(String, Int)]
     addLbl (Just lbl) prgCnt lblLst = (lbl, prgCnt) : lblLst
@@ -31,6 +31,20 @@ generateLine lbl (Just instr) (prgCnt, lblLst) _      = Right $ (Line lbl $ Just
 parseLine :: String -> (Int, [(String, Int)]) -> Int -> Either ParseError (Line, Int, [(String, Int)])
 parseLine l env lineNr = generateLine (getLabel tl) (getInstruction' tl) env lineNr where
   tl = tokenizeString l
+
+-- Same as parse line but takes a full env, that is env with an additional list of parsed lines
+parseLineFullEnv :: String -> ([Line], Int, [(String, Int)]) -> Int -> Either ParseError ([Line], Int, [(String, Int)])
+parseLineFullEnv l (ls, prgCnt, lblLst) lineNr = case parseLine l (prgCnt, lblLst) lineNr of
+  Left pe -> Left pe
+  Right (l', prgCnt', lblLst') -> Right (l' : ls, prgCnt', lblLst')
+
+parseLines :: [String] -> Either ParseError ([Line], Int, [(String, Int)])
+parseLines ls = parseLines' ls ([], 0, []) 1 where
+  parseLines' :: [String] -> ([Line], Int, [(String, Int)]) -> Int -> Either ParseError ([Line], Int, [(String, Int)])
+  parseLines' (l:ls) fullEnv lineNr = case parseLineFullEnv l fullEnv lineNr of
+    Left pe       -> Left pe
+    Right fullEnv -> parseLines' ls fullEnv (lineNr+1)
+  parseLines' [] fullEnv _          = Right fullEnv
 
 --parseLines :: [String] -> [Line]
 --parseLines (l:ls) = parseLine l : parseLines ls
