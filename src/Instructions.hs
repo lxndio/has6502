@@ -2,8 +2,10 @@ module Instructions
 ( Instruction
 , getInstrByName
 , instrExistsByName
-, getInstruction ) where
+, getInstruction
+, getInstruction' ) where
 
+import Utils
 
 data Opcodes = Opcodes { accumulator :: String
                        , immediate   :: String
@@ -37,6 +39,13 @@ getInstruction :: [String] -> Maybe Instruction
 getInstruction (l:ls) = case getInstrByName l of i@(Just _) -> i
                                                  Nothing    -> getInstruction ls
 getInstruction []     = Nothing
+
+-- Get the first occurence of an instruction in a tokenized line
+-- Returns the empty instruction if the line does not contain an instruction
+getInstruction' :: [String] -> Maybe Instruction
+getInstruction' l
+  | isLineEmpty l = getInstrByName "emp"
+  | otherwise     = getInstruction l
 
 instructions :: [Instruction]
 --               Instruction Name           acc  imm  zPa  zPaX zPaY abs  absX absY indX indY rel  impl ind
@@ -98,4 +107,5 @@ instructions = [ Instruction "ADC" (Opcodes ""   "69" "65" "75" ""   "6D" "7D" "
                , Instruction "TXA" (Opcodes ""   ""   ""   ""   ""   ""   ""   ""   ""   ""   ""   "8A" ""  )
                , Instruction "TXS" (Opcodes ""   ""   ""   ""   ""   ""   ""   ""   ""   ""   ""   "9A" ""  )
                , Instruction "TYA" (Opcodes ""   ""   ""   ""   ""   ""   ""   ""   ""   ""   ""   "98" ""  )
+               , Instruction "emp" (Opcodes ""   ""   ""   ""   ""   ""   ""   ""   ""   ""   ""   ""   ""  ) -- empty line
                ]
