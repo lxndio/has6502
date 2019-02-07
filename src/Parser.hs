@@ -2,6 +2,7 @@ module Parser
 ( parseLines ) where
 
 import Instructions
+import Parameters (validateParameters)
 import Utils
 
 data Line = Line { label  :: Maybe String
