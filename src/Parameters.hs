@@ -3,6 +3,7 @@ module Parameters
 , validateParameters ) where
 
 import Instructions (instrExistsByName)
+import Opcodes
 import Utils (isLabel)
 
 data ParameterType = Accumulator | Immediate | ZeroPage  | ZeroPageX | ZeroPageY | Absolute | AbsoluteX

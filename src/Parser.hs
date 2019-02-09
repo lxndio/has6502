@@ -2,6 +2,7 @@ module Parser
 ( parseLines ) where
 
 import Instructions
+import Opcodes (generateOpcodes)
 import Parameters (validateParameters)
 import Utils
 
