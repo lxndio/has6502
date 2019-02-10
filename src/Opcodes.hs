@@ -1,9 +1,7 @@
 module Opcodes
 ( generateOpcodes ) where
 
-import Instruction (Instruction)
-import Parameters (ParameterType)
-import Parser (ParseError)
+import Types
 
 getOpcodeForInstr :: String -> ParameterType -> Maybe String
 getOpcodeForInstr instr pt = if opcode == "" then Nothing else Just opcode where

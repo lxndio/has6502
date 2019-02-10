@@ -3,11 +3,8 @@ module Parameters
 , validateParameters ) where
 
 import Instructions (instrExistsByName)
-import Opcodes
+import Types
 import Utils (isLabel)
-
-data ParameterType = Accumulator | Immediate | ZeroPage  | ZeroPageX | ZeroPageY | Absolute | AbsoluteX
-                     | AbsoluteY | IndirectX | IndirectY | Relative  | Implied   | Indirect | Invalid deriving (Show)
 
 -- Get all parameters from a tokenized line
 getParameters :: [String] -> Maybe [String]

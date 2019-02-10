@@ -4,15 +4,8 @@ module Parser
 import Instructions
 import Opcodes (generateOpcodes)
 import Parameters (validateParameters)
+import Types (Line, ParseError)
 import Utils
-
-data Line = Line { label  :: Maybe String
-                 , bytes  :: Maybe String
-                 } deriving (Show)
-
-data ParseError = ParseError { line :: Int
-                             , msg  :: String
-                             } deriving (Show)
 
 -- TODO Use monad to throw ParseError on failure caused by nothing in case of:
 --      - no instruction but parameters
