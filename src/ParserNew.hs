@@ -5,7 +5,7 @@ import Data.Char (isLetter, isNumber)
 import Hex (isHex)
 import Instructions (instrExistsByName)
 import TypesNew
-import Utils (parseString, initN, tailN)
+import Utils (parseString, initN, tailN, tokenizeString)
 
 
 -- Returns the label of a line (if it has one)
@@ -59,9 +59,12 @@ detectTokenType :: String -> Either ParseError TokenType
 detectTokenType t
   | isValidLabel t      = Right Label
   | instrExistsByName t = Right Instr
---  | isValidParam t      = Right Param
+  | isValidParam t      = Right Param
   | otherwise           = Left $ ParseError 0 $ "Invalid token: " ++ t
 
 -- TODO Trim and convert everything to uppercase
 parseLine :: String -> Either ParseError Line
-parseLine = undefined
+parseLine l = do
+  let tl = tokenizeString l
+--  tokenTypes <- detectTokenType <$> tl
+  return $ Line Nothing Nothing Nothing
