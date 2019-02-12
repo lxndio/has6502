@@ -7,6 +7,9 @@ module Instructions
 import Types
 import Utils
 
+-- TODO delete
+isLineEmpty = undefined
+
 getInstrByName :: String -> Maybe Instruction
 getInstrByName s = if length instructions' == 0 then Nothing else Just $ head $ instructions' where
   instructions' = filter ((== s) . name) instructions

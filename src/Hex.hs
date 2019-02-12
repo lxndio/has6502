@@ -1,5 +1,7 @@
 module Hex where
 
+import Utils (parseString)
+
 data HexDigit = H0 | H1 | H2 | H3 | H4 | H5 | H6 | H7 | H8 | H9 | HA | HB | HC | HD | HE | HF deriving (Show)
 type HexNumber = [HexDigit]
 
@@ -7,6 +9,8 @@ data HexParseError = HexParseError String deriving (Show)
 
 hexValues = [ (H0, 0), (H1, 1) , (H2, 2) , (H3, 3) , (H4, 4) , (H5, 5) , (H6, 6), (H7, 7)
             , (H8, 8), (H9, 9), (HA, 10), (HB, 11), (HC, 12), (HD, 13), (HE, 14), (HF, 15) ]
+
+hexChars = "0123456789ABCDEF"
 
 instance Eq HexDigit where
   (==) H0 H0 = True
@@ -38,3 +42,7 @@ hexToInt :: HexNumber -> Int
 hexToInt h = iter h (length h - 1) where
   iter (h:hs) pos = (getHexValue h) * 16^pos + iter hs (pos-1)
   iter []     _   = 0
+
+-- Checks if a char can represent a hexadecimal value
+isHex :: Char -> Bool
+isHex s = s `elem` hexChars

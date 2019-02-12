@@ -1,10 +1,4 @@
-module Utils
-( splitString
-, trim
-, tokenizeString
-, isLineEmpty
-, getLabel
-, isLabel ) where
+module Utils where
 
 import Data.Char (toUpper)
 
@@ -26,15 +20,35 @@ trim l = trimTail $ dropWhile (== ' ') l where
 tokenizeString :: String -> [String]
 tokenizeString s = map (map toUpper) $ splitString ' ' s
 
+-- Checks if a function is true for each character of a string,
+-- returns false if it is not
+parseString :: String -> (Char -> Bool) -> Bool
+parseString (a:as) f = if f a then parseString as f else False
+parseString []     _ = True
+
+-- Returns the first n elements of a list
+initN :: [a] -> Int -> [a]
+initN s@(a:as) n
+  | n > length as = s
+  | n > 0         = a : initN as (n-1)
+  | otherwise     = []
+
+-- Returns the last n elements of a list
+tailN :: [a] -> Int -> [a]
+tailN as n
+  | n < length as = loop as $ length as -1-n
+  | otherwise     = as
+  where
+    loop (a:as) n
+      | n > 0      = loop as $ n-1
+      | otherwise  = as
+
 -- Checks if a tokenized line is empty (apart from a label)
-isLineEmpty :: [String] -> Bool
-isLineEmpty l = (length l == 1) && (isLabel $ head l)
+--isLineEmpty :: [String] -> Bool
+--isLineEmpty l = (length l == 1) && (isLabel $ head l)
 
 -- Get the first occurrence of a label in a tokenized line
-getLabel :: [String] -> Maybe String
-getLabel l = if length (labelList l) == 0 then Nothing else Just $ init $ head $ labelList l where
-  labelList l = filter ((== ':') . last) l
+--getLabel :: [String] -> Maybe String
+--getLabel l = if length (labelList l) == 0 then Nothing else Just $ init $ head $ labelList l where
+--  labelList l = filter ((== ':') . last) l
 
--- Checks if a given string has the format required to be label
-isLabel :: String -> Bool
-isLabel = (== ':') . last
