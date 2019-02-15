@@ -2,6 +2,8 @@ module Utils where
 
 import Data.Char (toUpper)
 
+import TypesNew
+
 splitString :: Char -> String -> [String]
 splitString c as = split c as "" where
   split :: Char -> String -> String -> [String]
@@ -16,8 +18,8 @@ trim l = trimTail $ dropWhile (== ' ') l where
   trimTail ls = if l == ' ' then trimTail (init ls) else ls where
     l = last ls
 
--- Split string using space as delimiter and capitalize all characters
-tokenizeString :: String -> [String]
+-- Split string using spaces as delimiter and capitalize all characters
+tokenizeString :: String -> TokenizedString
 tokenizeString s = map (map toUpper) $ splitString ' ' s
 
 -- Checks if a function is true for each character of a string,
@@ -52,3 +54,7 @@ tailN as n
 --getLabel l = if length (labelList l) == 0 then Nothing else Just $ init $ head $ labelList l where
 --  labelList l = filter ((== ':') . last) l
 
+-- Add a specific line number to each parse error in a ParseErrors list
+addLineNumbers :: ParseErrors -> Int -> ParseErrors
+addLineNumbers (pe:pes) lineNr = ParseError lineNr (text pe) : addLineNumbers pes lineNr
+addLineNumbers []       _      = []
