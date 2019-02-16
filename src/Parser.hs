@@ -1,4 +1,6 @@
-module Parser () where
+module Parser
+( parseLine
+, parseLines ) where
 
 import Data.Char (isLetter, isNumber)
 
@@ -6,7 +8,6 @@ import Hex (isHex)
 import Instructions (getInstrByName', instrExistsByName)
 import Types
 import Utils (parseString, initN, tailN, tokenizeString, addLineNumbers)
-
 
 -- Returns the label of a line (if it has one)
 -- A label always has to be the first token and has to end with a colon
@@ -89,9 +90,9 @@ evalTokenOrder :: TokenList -> Either ParseErrors Bool
 evalTokenOrder tl = if length (loop tl 0) == 0 then Right True else Left $ loop tl 0 where
   loop :: TokenList -> Int -> ParseErrors
   loop (t:ts) cnt = case tokenType t of
-    Label -> if cnt == 0 then loop ts (cnt+1) else (ParseError 0 ("Label at wrong position: '" ++ value t ++ "'")) : loop ts (cnt+1)
-    Instr -> if cnt == 0 || cnt == 1 then loop ts (cnt+1) else (ParseError 0 ("Instruction at wrong position: '" ++ value t ++ "'")) : loop ts (cnt+1)
-    Param -> if cnt /= 0 then loop ts (cnt+1) else (ParseError 0 ("Parameter at wrong position: '" ++ value t ++ "'")) : loop ts (cnt+1)
+    Label -> if cnt == 0 then loop ts (cnt+1) else (ParseError 0 ("Label at wrong position:\t'" ++ value t ++ "'")) : loop ts (cnt+1)
+    Instr -> if cnt == 0 || cnt == 1 then loop ts (cnt+1) else (ParseError 0 ("Instruction at wrong position:\t'" ++ value t ++ "'")) : loop ts (cnt+1)
+    Param -> if cnt /= 0 then loop ts (cnt+1) else (ParseError 0 ("Parameter at wrong position:\t'" ++ value t ++ "'")) : loop ts (cnt+1)
   loop []     _   = []
 
 -- Checks if there is an instruction before each parameter
@@ -107,15 +108,16 @@ evalParameterExistence tl = if length (loop tl 0) == 0 then Right True else Left
           then loop tl (cnt+1)
           else if cnt < (length tl - 1) && tokenType (tl !! (cnt+1)) == Param
             then loop tl (cnt+1)
-            else (ParseError 0 ("Instruction without parameter: '" ++ value current ++ "'")) : loop tl (cnt+1)
+            else (ParseError 0 ("Instruction without parameter:\t'" ++ value current ++ "'")) : loop tl (cnt+1)
         Param -> if tokenType (tl !! (cnt-1)) == Instr
           then loop tl (cnt+1)
-          else (ParseError 0 ("Parameter without instruction: '" ++ value current ++ "'")) : loop tl (cnt+1)
+          else (ParseError 0 ("Parameter without instruction:\t'" ++ value current ++ "'")) : loop tl (cnt+1)
     | cnt >= length tl = []
 
 parseLine :: String -> Either ParseErrors TokenList
 parseLine l = do
-  let tl = tokenizeString l
+  -- Tokenize the given String and remove comments (everything after a semicolon and the semicolon itself)
+  let tl = tokenizeString $ takeWhile (/= ';') l
   tokens <- parseTokens tl
   evalTokenOrder tokens
   evalParameterExistence tokens
