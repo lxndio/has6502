@@ -1,5 +1,6 @@
 module Instructions
 ( getInstrByName
+, getInstrByName'
 , instrExistsByName
 , getInstruction
 , getInstruction' ) where
@@ -13,6 +14,10 @@ isLineEmpty = undefined
 getInstrByName :: String -> Maybe Instruction
 getInstrByName s = if length instructions' == 0 then Nothing else Just $ head $ instructions' where
   instructions' = filter ((== s) . name) instructions
+
+-- Unsafe version of getInstrByName
+getInstrByName' :: String -> Instruction
+getInstrByName' s = head $ filter ((== s) . name) instructions
 
 instrExistsByName :: String -> Bool
 instrExistsByName s = if length instructions' == 0 then False else True where
@@ -53,7 +58,7 @@ instructions = [ Instruction "ADC" (OpcodeList ""   "69" "65" "75" ""   "6D" "7D
                , Instruction "CMP" (OpcodeList ""   "C9" "C5" "D5" ""   "CD" "DD" "D9" "C1" "D1" ""   ""   ""  )
                , Instruction "CPX" (OpcodeList ""   "E0" "E4" ""   ""   "EC" ""   ""   ""   ""   ""   ""   ""  )
                , Instruction "CPY" (OpcodeList ""   "C0" "C4" ""   ""   "CC" ""   ""   ""   ""   ""   ""   ""  )
---               Instruction Name           acc  imm  zPa  zPaX zPaY abs  absX absY indX indY rel  impl ind
+--               Instruction Name              acc  imm  zPa  zPaX zPaY abs  absX absY indX indY rel  impl ind
                , Instruction "DEC" (OpcodeList ""   ""   "C6" "D6" ""   "CE" "DE" ""   ""   ""   ""   ""   ""  )
                , Instruction "DEX" (OpcodeList ""   ""   ""   ""   ""   ""   ""   ""   ""   ""   ""   "CA" ""  )
                , Instruction "DEY" (OpcodeList ""   ""   ""   ""   ""   ""   ""   ""   ""   ""   ""   "88" ""  )
@@ -75,7 +80,7 @@ instructions = [ Instruction "ADC" (OpcodeList ""   "69" "65" "75" ""   "6D" "7D
                , Instruction "PLP" (OpcodeList ""   ""   ""   ""   ""   ""   ""   ""   ""   ""   ""   "28" ""  )
                , Instruction "ROL" (OpcodeList "2A" ""   "26" "36" ""   "2E" "3E" ""   ""   ""   ""   ""   ""  )
                , Instruction "ROR" (OpcodeList "6A" ""   "66" "76" ""   "6E" "7E" ""   ""   ""   ""   ""   ""  )
---               Instruction Name           acc  imm  zPa  zPaX zPaY abs  absX absY indX indY rel  impl ind
+--               Instruction Name              acc  imm  zPa  zPaX zPaY abs  absX absY indX indY rel  impl ind
                , Instruction "RTI" (OpcodeList ""   ""   ""   ""   ""   ""   ""   ""   ""   ""   ""   "40" ""  )
                , Instruction "RTS" (OpcodeList ""   ""   ""   ""   ""   ""   ""   ""   ""   ""   ""   "60" ""  )
                , Instruction "SBC" (OpcodeList ""   "E9" "E5" "F5" ""   "ED" "FD" "F9" "E1" "F1" ""   ""   ""  )

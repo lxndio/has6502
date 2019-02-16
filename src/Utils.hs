@@ -2,7 +2,7 @@ module Utils where
 
 import Data.Char (toUpper)
 
-import TypesNew
+import Types
 
 splitString :: Char -> String -> [String]
 splitString c as = split c as "" where

@@ -1,5 +1,29 @@
 module Types where
 
+data Line = Line { label :: Maybe String
+                 , instr :: Maybe String
+                 , param :: Maybe String } deriving (Show)
+
+data ParseError = ParseError { line :: Int
+                             , text :: String } deriving (Show)
+
+type ParseErrors = [ParseError]
+
+type TokenizedString = [String]
+
+data TokenType = Label | Instr | Param deriving (Show)
+
+instance Eq TokenType where
+  Label == Label = True
+  Instr == Instr = True
+  Param == Param = True
+  _     == _     = False
+
+data Token = Token { tokenType :: TokenType
+                   , value     :: String    } deriving (Show)
+
+type TokenList = [Token]
+
 data ParameterType = Accumulator | Immediate | ZeroPage  | ZeroPageX | ZeroPageY | Absolute | AbsoluteX
                      | AbsoluteY | IndirectX | IndirectY | Relative  | Implied   | Indirect | Invalid deriving (Show)
 
@@ -21,11 +45,3 @@ data OpcodeList = OpcodeList { accumulator :: String
 data Instruction = Instruction { name       :: String
                                , opcodeList :: OpcodeList
                                } deriving (Show)
-
-data Line = Line { label  :: Maybe String
-                 , bytes  :: Maybe String
-                 } deriving (Show)
-
-data ParseError = ParseError { line :: Int
-                             , msg  :: String
-                             } deriving (Show)

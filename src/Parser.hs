@@ -3,8 +3,8 @@ module Parser () where
 import Data.Char (isLetter, isNumber)
 
 import Hex (isHex)
-import Instructions (instrExistsByName)
-import TypesNew
+import Instructions (getInstrByName', instrExistsByName)
+import Types
 import Utils (parseString, initN, tailN, tokenizeString, addLineNumbers)
 
 
@@ -94,14 +94,31 @@ evalTokenOrder tl = if length (loop tl 0) == 0 then Right True else Left $ loop 
     Param -> if cnt /= 0 then loop ts (cnt+1) else (ParseError 0 ("Parameter at wrong position: '" ++ value t ++ "'")) : loop ts (cnt+1)
   loop []     _   = []
 
--- TODO check if there is a parameter but no instruction or vice versa (for instructions that need a parameter)
+-- Checks if there is an instruction before each parameter
+-- and a parameter after each instruction
+evalParameterExistence :: TokenList -> Either ParseErrors Bool
+evalParameterExistence tl = if length (loop tl 0) == 0 then Right True else Left $ loop tl 0 where
+  loop :: TokenList -> Int -> ParseErrors
+  loop tl cnt
+    | cnt < length tl = let current = tl !! cnt in
+      case tokenType current of
+        Label -> loop tl (cnt+1)
+        Instr -> if (implied $ opcodeList $ getInstrByName' $ value current) /= ""
+          then loop tl (cnt+1)
+          else if cnt < (length tl - 1) && tokenType (tl !! (cnt+1)) == Param
+            then loop tl (cnt+1)
+            else (ParseError 0 ("Instruction without parameter: '" ++ value current ++ "'")) : loop tl (cnt+1)
+        Param -> if tokenType (tl !! (cnt-1)) == Instr
+          then loop tl (cnt+1)
+          else (ParseError 0 ("Parameter without instruction: '" ++ value current ++ "'")) : loop tl (cnt+1)
+    | cnt >= length tl = []
 
--- TODO Trim and convert everything to uppercase
 parseLine :: String -> Either ParseErrors TokenList
 parseLine l = do
   let tl = tokenizeString l
   tokens <- parseTokens tl
   evalTokenOrder tokens
+  evalParameterExistence tokens
   return tokens
 
 parseLines :: [String] -> Either ParseErrors TokenList
