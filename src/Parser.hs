@@ -5,7 +5,7 @@ module Parser
 import Data.Char (isLetter, isNumber)
 
 import Hex (isHex)
-import Instructions (getInstrByName', instrExistsByName)
+import Instructions (getInstrByName', instrExistsByName, instrNeedsParameter)
 import Types
 import Utils (parseString, initN, tailN, tokenizeString, addLineNumbers)
 
@@ -104,7 +104,7 @@ evalParameterExistence tl = if length (loop tl 0) == 0 then Right True else Left
     | cnt < length tl = let current = tl !! cnt in
       case tokenType current of
         Label -> loop tl (cnt+1)
-        Instr -> if (implied $ opcodeList $ getInstrByName' $ value current) /= ""
+        Instr -> if (instrNeedsParameter $ value current) /= ""
           then loop tl (cnt+1)
           else if cnt < (length tl - 1) && tokenType (tl !! (cnt+1)) == Param
             then loop tl (cnt+1)

@@ -1,9 +1,5 @@
 module Types where
 
-data Line = Line { label :: Maybe String
-                 , instr :: Maybe String
-                 , param :: Maybe String } deriving (Show)
-
 data ParseError = ParseError { line :: Int
                              , text :: String } deriving (Show)
 
@@ -45,3 +41,8 @@ data OpcodeList = OpcodeList { accumulator :: String
 data Instruction = Instruction { name       :: String
                                , opcodeList :: OpcodeList
                                } deriving (Show)
+
+data Environment = Environment { prgmCtr   :: Int
+                               , labelList :: [(Int, String)]
+                               , output    :: String
+                               }

@@ -2,6 +2,7 @@ module Instructions
 ( getInstrByName
 , getInstrByName'
 , instrExistsByName
+, instrNeedsParameter
 , getInstruction
 , getInstruction' ) where
 
@@ -23,6 +24,10 @@ instrExistsByName :: String -> Bool
 instrExistsByName s = if length instructions' == 0 then False else True where
   instructions' = filter ((== s) . name) instructions
 
+-- Checks if an instruction needs a parameter (unsafe)
+instrNeedsParameter :: String -> Bool
+instrNeedsParameter s = (implied $ opcodeList $ getInstrByName' s) == ""
+
 -- Get the first occurrence of an instruction in a tokenized line
 getInstruction :: [String] -> Maybe Instruction
 getInstruction (l:ls) = case getInstrByName l of i@(Just _) -> i
@@ -35,6 +40,27 @@ getInstruction' :: [String] -> Maybe Instruction
 getInstruction' l
   | isLineEmpty l = getInstrByName "emp"
   | otherwise     = getInstruction l
+
+getOpcodeByParameterType :: String -> ParameterType -> Maybe String
+getOpcodeByParameterType instr pt = if instrExistsByName instr
+  then case pt of
+    Accumulator -> Just $ accumulator opLst
+    Immediate   -> Just $ immediate opLst
+    ZeroPage    -> Just $ zeroPage opLst
+    ZeroPageX   -> Just $ zeroPageX opLst
+    ZeroPageY   -> Just $ zeroPageY opLst
+    Absolute    -> Just $ absolute opLst
+    AbsoluteX   -> Just $ absoluteX opLst
+    AbsoluteY   -> Just $ absoluteY opLst
+    IndirectX   -> Just $ indirectX opLst
+    IndirectY   -> Just $ indirectY opLst
+    Relative    -> Just $ relative opLst
+    Implied     -> Just $ implied opLst
+    Indirect    -> Just $ indirect opLst
+    Invalid     -> Nothing
+  else Nothing
+  where
+    opLst = opcodeList $ getInstrByName' instr
 
 instructions :: [Instruction]
 --               Instruction Name              acc  imm  zPa  zPaX zPaY abs  absX absY indX indY rel  impl ind
