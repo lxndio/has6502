@@ -36,13 +36,11 @@ isValidLabelAsParam s = parseString s (\c -> isLetter c || isNumber c || c == '-
 -- Checks if a given string a valid numeric value
 -- (decimal or hexadecimal; including immediate values using #)
 isNumericVal :: String -> Bool
-isNumericVal s
-  | parseString s' isNumber = True
-  | parseString s' isHex    = True
-  | otherwise               = False
-  where
-    s' = case head s of '#' -> tail s
-                        _   -> s
+isNumericVal (a:as)
+  | parseString as isNumber          = True
+  | a == '$' && parseString as isHex = True
+  | a == '#'                         = isNumericVal as
+  | otherwise                        = False
 
 -- Checks if a given string is a valid parameter
 -- Requirements:
@@ -104,7 +102,7 @@ evalParameterExistence tl = if length (loop tl 0) == 0 then Right True else Left
     | cnt < length tl = let current = tl !! cnt in
       case tokenType current of
         Label -> loop tl (cnt+1)
-        Instr -> if (instrNeedsParameter $ value current) /= ""
+        Instr -> if not $ instrNeedsParameter $ value current
           then loop tl (cnt+1)
           else if cnt < (length tl - 1) && tokenType (tl !! (cnt+1)) == Param
             then loop tl (cnt+1)

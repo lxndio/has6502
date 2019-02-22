@@ -25,8 +25,7 @@ tokenizeString s = map (map toUpper) $ splitString ' ' s
 -- Checks if a function is true for each character of a string,
 -- returns false if it is not
 parseString :: String -> (Char -> Bool) -> Bool
-parseString (a:as) f = if f a then parseString as f else False
-parseString []     _ = True
+parseString as f = foldl (&&) True $ map f as
 
 -- Returns the first n elements of a list
 initN :: [a] -> Int -> [a]
