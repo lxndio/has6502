@@ -1,6 +1,7 @@
 module Parser
 ( parseLine
-, parseLines ) where
+, parseLines
+, isLabel ) where
 
 import Data.Char (isLetter, isNumber)
 

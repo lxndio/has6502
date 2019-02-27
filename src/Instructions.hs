@@ -41,27 +41,6 @@ getInstruction' l
   | isLineEmpty l = getInstrByName "emp"
   | otherwise     = getInstruction l
 
-getOpcodeByParameterType :: String -> ParameterType -> Maybe String
-getOpcodeByParameterType instr pt = if instrExistsByName instr
-  then case pt of
-    Accumulator -> Just $ accumulator opLst
-    Immediate   -> Just $ immediate opLst
-    ZeroPage    -> Just $ zeroPage opLst
-    ZeroPageX   -> Just $ zeroPageX opLst
-    ZeroPageY   -> Just $ zeroPageY opLst
-    Absolute    -> Just $ absolute opLst
-    AbsoluteX   -> Just $ absoluteX opLst
-    AbsoluteY   -> Just $ absoluteY opLst
-    IndirectX   -> Just $ indirectX opLst
-    IndirectY   -> Just $ indirectY opLst
-    Relative    -> Just $ relative opLst
-    Implied     -> Just $ implied opLst
-    Indirect    -> Just $ indirect opLst
-    Invalid     -> Nothing
-  else Nothing
-  where
-    opLst = opcodeList $ getInstrByName' instr
-
 instructions :: [Instruction]
 --               Instruction Name              acc  imm  zPa  zPaX zPaY abs  absX absY indX indY rel  impl ind
 instructions = [ Instruction "ADC" (OpcodeList ""   "69" "65" "75" ""   "6D" "7D" "79" "61" "71" ""   ""   ""  )

@@ -1,5 +1,6 @@
 module Main where
 
+import Assembler
 import Parser
 import Types
 

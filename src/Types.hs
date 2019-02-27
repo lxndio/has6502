@@ -45,4 +45,4 @@ data Instruction = Instruction { name       :: String
 data Environment = Environment { prgmCtr   :: Int
                                , labelList :: [(Int, String)]
                                , output    :: String
-                               }
+                               } deriving (Show)

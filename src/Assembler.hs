@@ -1,4 +1,5 @@
-module Assembler where
+module Assembler
+( assembleLine ) where
 
 import Instructions (getInstrByName', instrNeedsParameter)
 import Types
@@ -13,4 +14,4 @@ assembleLine (t:ts) env = case tokenType t of
     else assembleLine ts $ Environment (prgmCtr env + 8)
                                        (labelList env)
                                        (output env ++ (implied $ opcodeList $ getInstrByName' $ value t))
-  Param -> undefined
+  Param -> env
