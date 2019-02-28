@@ -57,3 +57,12 @@ tailN as n
 addLineNumbers :: ParseErrors -> Int -> ParseErrors
 addLineNumbers (pe:pes) lineNr = ParseError lineNr (text pe) : addLineNumbers pes lineNr
 addLineNumbers []       _      = []
+
+-- Check if a map contains a pair with the given key
+containsKey :: Eq a => [(a, b)] -> a -> Bool
+(a:as) `containsKey` key = if fst a == key then True else as `containsKey` key
+[]     `containsKey` key = False
+
+getValue :: Eq a => [(a, b)] -> a -> Maybe b
+getValue (a:as) key = if fst a == key then Just $ snd a else getValue as key
+getValue []     key = Nothing

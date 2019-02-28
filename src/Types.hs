@@ -21,7 +21,8 @@ data Token = Token { tokenType :: TokenType
 type TokenList = [Token]
 
 data ParameterType = Accumulator | Immediate | ZeroPage  | ZeroPageX | ZeroPageY | Absolute | AbsoluteX
-                     | AbsoluteY | IndirectX | IndirectY | Relative  | Implied   | Indirect | Invalid deriving (Show)
+                     | AbsoluteY | IndirectX | IndirectY | Relative  | Implied   | Indirect | Invalid
+                     | Unknown deriving (Show)
 
 data OpcodeList = OpcodeList { accumulator :: String
                              , immediate   :: String
@@ -43,6 +44,6 @@ data Instruction = Instruction { name       :: String
                                } deriving (Show)
 
 data Environment = Environment { prgmCtr   :: Int
-                               , labelList :: [(Int, String)]
+                               , labelList :: [(String, Maybe Int)]
                                , output    :: String
                                } deriving (Show)
